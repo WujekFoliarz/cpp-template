@@ -11,8 +11,8 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.hpp)
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # -- Libraries --
-add_subdirectory("deps/raylib")
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+# add_subdirectory("deps/raylib")
+# target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 # -- Extension --
 # set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".asi")
