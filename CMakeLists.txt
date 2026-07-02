@@ -17,11 +17,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/s
 # -- Extension --
 # set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".asi")
 
-# -- Strip debug symbols LINUX --
-if (LINUX)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND objcopy --only-keep-debug $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.debug
-    COMMAND strip --strip-debug --strip-unneeded $<TARGET_FILE:${PROJECT_NAME}>
-    COMMAND objcopy --add-gnu-debuglink=${PROJECT_NAME}.debug $<TARGET_FILE:${PROJECT_NAME}>
-)
+# -- Strip debug symbols and statically link libgcc on mingw --
+set(DEBUG_FILE "${PROJECT_NAME}.debug")
+
+if(MINGW)
+    set(DEBUG_FILE "${PROJECT_NAME}.pdb")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} --only-keep-debug $<TARGET_FILE:${PROJECT_NAME}> ${DEBUG_FILE}
+    COMMAND ${CMAKE_OBJCOPY} --strip-all --strip-unneeded $<TARGET_FILE:${PROJECT_NAME}>
+    COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=${DEBUG_FILE} $<TARGET_FILE:${PROJECT_NAME}>
+)
